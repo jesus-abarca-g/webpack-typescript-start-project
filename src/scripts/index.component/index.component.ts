@@ -1,5 +1,5 @@
 export class IndexComponent {
     init() {
-        // console.log('hola mundo');
+        // console.log('hello world!');
     }
 }

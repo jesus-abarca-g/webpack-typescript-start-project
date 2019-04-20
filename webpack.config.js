@@ -1,6 +1,8 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 module.exports = {
     entry: path.join(__dirname, '/src/scripts/app.ts'),
     output: {
@@ -17,56 +19,56 @@ module.exports = {
             {
                 test:/\.(s*)css$/,
                 use: [
-                    // {
-                    //     loader: MiniCssExtractPlugin.loader,
-                    //     options: {
-                            
-                    //     }
-                    // },
-                    'style-loader',
+                    {
+                        loader: MiniCssExtractPlugin.loader,
+                        options: {
+                            hmr: process.env.NODE_ENV === 'development', // hot module reload
+                        }
+                    },
                     'css-loader',
                     'sass-loader'
                 ]
                 
-                // ExtractTextPlugin.extract({ 
-                //     fallback:'style-loader',
-                //     use:['css-loader','sass-loader'],
-                // })
-
-
-                // test: /\.css$/,
-                // use: [
-                //   {
-                //     loader: MiniCssExtractPlugin.loader,
-                //     options: {
-                //       // you can specify a publicPath here
-                //       // by default it uses publicPath in webpackOptions.output
-                //       publicPath: '../',
-                //       hmr: process.env.NODE_ENV === 'development',
-                //     },
-                //   },
-                //   'css-loader',
-                // ],
              }
         ]
     },
     plugins: [
+        new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             hash: true,
             filename: './index.html',
-            title: 'Enla de Ayuda por La Paz',
-            // customvalue: '<span>holamundo</span>',
+            title: 'My Page Title',
             template: './src/index.html',
         }),
-        // new ExtractTextPlugin({filename:'./app.bundle.css'}),
+        new MiniCssExtractPlugin({
+            filename: 'styles/[name].css',
+            chunkFilename: '[id].css',
+          }),
+          new CopyPlugin([
+            {
+              from: 'src/images',
+              to: 'images/[name].[ext]',
+              toType: 'template',
+              ignore: ['\.DS_Store*', 'README'],
+            },
+          ]),
+          new CopyPlugin([
+            {
+              from: 'src/fonts',
+              to: 'fonts/[name].[ext]',
+              toType: 'template',
+              ignore: ['\.DS_Store*','README'],
+            },
+          ]),
     ],
     resolve: {
         extensions: [".tsx", ".ts", ".js"]
     },
     devServer: {
-        host: 'grunt.local.lan',
+        host: 'localhost',
         contentBase: path.join(__dirname, 'src'),
         compress: true,
+        open: true,
         port: 4200
       }
 };
